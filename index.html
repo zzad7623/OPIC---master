@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="OPIc Master">
+  <meta name="theme-color" content="#4f46e5">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <title>OPIc AI Master - 스마트폰 오픽 실전 훈련기</title>
+
+  <!-- Tailwind CSS & Google Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Mobile App-like smooth styling */
+    body {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    input, textarea {
+      user-select: text;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    @keyframes soundwave {
+      0%, 100% { height: 6px; }
+      50% { height: 26px; }
+    }
+    .wave-bar {
+      animation: soundwave 1s ease-in-out infinite;
+    }
+    .wave-bar:nth-child(2) { animation-delay: 0.15s; }
+    .wave-bar:nth-child(3) { animation-delay: 0.3s; }
+    .wave-bar:nth-child(4) { animation-delay: 0.45s; }
+    .wave-bar:nth-child(5) { animation-delay: 0.6s; }
+  </style>
+</head>
+
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-sans pb-24 antialiased">
+
+  <!-- Top App Bar -->
+  <header class="sticky top-0 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-4 py-3">
+    <div class="max-w-md mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-md shadow-indigo-500/20 text-white font-black text-sm">
+          O
+        </div>
+        <div>
+          <h1 class="text-base font-extrabold tracking-tight flex items-center gap-1.5">
+            OPIc AI Master
+            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700 dark:bg-indigo-900/60 dark:text-indigo-300">IM 집중</span>
+          </h1>
+        </div>
+      </div>
+      
+      <!-- Right buttons -->
+      <div class="flex items-center space-x-2">
+        <button id="btn-open-settings" class="p-2 rounded-xl text-slate-500 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" title="설정">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-md w-full mx-auto px-4 pt-3 space-y-4">
+
+    <!-- Mock Test Header Banner (Only visible in Mock Test mode) -->
+    <div id="mock-header-banner" class="hidden p-3 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg space-y-2">
+      <div class="flex items-center justify-between text-xs font-semibold">
+        <span class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>실전 모의고사 (오픽만수르 15문항 기출)</span>
+        </span>
+        <span id="mock-progress-badge" class="px-2 py-0.5 rounded-full bg-white/20">Question 1 / 15</span>
+      </div>
+      <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
+        <div id="mock-step-progress-bar" class="bg-white h-full rounded-full transition-all duration-300" style="width: 6.6%;"></div>
+      </div>
+    </div>
+
+    <!-- ================= VIEW 1: PRACTICE VIEW (RANDOM & MOCK) ================= -->
+    <div id="mode-practice-view" class="space-y-4">
+      
+      <!-- Ava Virtual Examiner Card -->
+      <section class="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm relative overflow-hidden">
+        
+        <!-- Question Category Badges -->
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center space-x-1.5">
+            <span id="question-category-badge" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900">
+              공원 가기
+            </span>
+            <span id="question-combo-badge" class="text-xs font-medium px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+              일상 루틴
+            </span>
+          </div>
+
+          <button id="btn-toggle-script" class="text-xs font-medium text-slate-500 hover:text-indigo-600 dark:text-slate-400 transition-colors">
+            질문 텍스트 보기 👁️
+          </button>
+        </div>
+
+        <!-- Ava Avatar & Speaking Indicator -->
+        <div class="flex items-center space-x-3.5 mb-3">
+          <div class="relative">
+            <div id="ava-avatar" class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-pink-400 via-purple-400 to-indigo-500 flex items-center justify-center shadow-md transition-all duration-300 text-2xl">
+              👩‍💼
+            </div>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-center space-x-1.5">
+              <span class="text-sm font-bold text-slate-800 dark:text-slate-200">Ava (에바)</span>
+              <span class="text-[10px] text-slate-400 font-semibold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800">OPIc 시험관</span>
+            </div>
+            <p id="ava-status" class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              질문을 듣고 답변을 준비하세요.
+            </p>
+          </div>
+        </div>
+
+        <!-- Hidden Question Text Box (Toggled by user) -->
+        <div id="question-script-box" class="hidden p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 space-y-2 mb-3">
+          <div>
+            <p class="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-1">Question</p>
+            <p id="question-en-text" class="text-sm font-medium text-slate-800 dark:text-slate-200 leading-snug"></p>
+          </div>
+          <div>
+            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">한국어 해석</p>
+            <p id="question-ko-text" class="text-xs text-slate-600 dark:text-slate-400"></p>
+          </div>
+          <div class="pt-1.5 border-t border-slate-200 dark:border-slate-700">
+            <p class="text-xs text-amber-600 dark:text-amber-400 flex items-start gap-1">
+              <span>💡</span>
+              <span id="question-tip-text"></span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Voice Audio Controls (Play & 1-time Replay) -->
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <button id="btn-play-question" class="py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all">
+            <svg class="w-4 h-4 text-indigo-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+            <span>질문 듣기</span>
+          </button>
+          
+          <button id="btn-replay-question" class="py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all" title="오픽 시험과 동일하게 1회만 다시 듣기 가능">
+            <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            <span>다시 듣기 (1회 한정)</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- User Response & Recording Section -->
+      <section class="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3">
+        
+        <!-- Timer & Status Bar -->
+        <div class="flex items-center justify-between text-xs font-medium">
+          <div class="flex items-center space-x-2">
+            <span class="text-slate-400">답변 시간 (권장 2분)</span>
+            <span id="timer-display" class="font-mono font-bold text-sm text-indigo-600 dark:text-indigo-400">2:00</span>
+          </div>
+          <span id="word-count-badge" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">
+            0 단어
+          </span>
+        </div>
+
+        <!-- Timer Progress Bar -->
+        <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+          <div id="timer-progress-bar" class="h-full bg-indigo-500 rounded-full transition-all duration-300" style="width: 100%;"></div>
+        </div>
+
+        <!-- Soundwave Animation (Active when recording) -->
+        <div id="record-wave" class="hidden flex items-center justify-center space-x-1.5 py-2">
+          <span class="wave-bar w-1 bg-rose-500 rounded-full"></span>
+          <span class="wave-bar w-1 bg-rose-500 rounded-full"></span>
+          <span class="wave-bar w-1 bg-rose-500 rounded-full"></span>
+          <span class="wave-bar w-1 bg-rose-500 rounded-full"></span>
+          <span class="wave-bar w-1 bg-rose-500 rounded-full"></span>
+        </div>
+
+        <!-- Big Touch-friendly Record Button -->
+        <button id="btn-record-toggle" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 font-bold shadow-lg shadow-indigo-600/25 transition-all transform active:scale-95 text-white">
+          <span class="flex items-center justify-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 02-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+            <span>답변 녹음 시작 (START)</span>
+          </span>
+        </button>
+
+        <p id="record-status" class="text-center text-[11px] text-slate-400">
+          마이크 버튼을 누르고 답변하거나, 아래 텍스트를 직접 수정하세요.
+        </p>
+
+        <!-- User Answer Input / STT Transcript -->
+        <div class="space-y-1">
+          <textarea id="user-answer-input" rows="4" 
+            placeholder="음성으로 말씀하시면 여기에 실시간으로 변환됩니다. 지하철/카페 등에서는 직접 타이핑하셔도 좋습니다."
+            class="w-full p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm leading-relaxed text-slate-800 dark:text-slate-100 placeholder-slate-400 resize-none custom-scrollbar"></textarea>
+        </div>
+
+        <!-- My Recorded Audio Player (Shown after recording ends) -->
+        <div id="my-audio-container" class="hidden p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+          <span class="text-xs font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+            <span>🎙️</span> 내 발화 다시 듣기:
+          </span>
+          <audio id="my-audio-player" controls class="h-8 max-w-[200px]"></audio>
+        </div>
+
+        <!-- Action Buttons: Feedback & Next Question -->
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <button id="btn-get-feedback" class="py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/20 flex items-center justify-center space-x-1.5 transition-all transform active:scale-95">
+            <span>✨</span>
+            <span>AI 채점 & 첨삭 받기</span>
+          </button>
+          
+          <button id="btn-next-question" class="py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center justify-center space-x-1.5 transition-all">
+            <span>다음 질문 ➔</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- AI Feedback & Coaching Card (Revealed on click) -->
+      <section id="feedback-container" class="hidden p-4 rounded-3xl bg-white dark:bg-slate-900 border border-indigo-100 dark:border-indigo-900 shadow-md space-y-4">
+        
+        <!-- Loading State -->
+        <div id="feedback-loading" class="hidden py-8 text-center space-y-3">
+          <div class="inline-block w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+          <p class="text-xs text-slate-500 font-medium">Gemini AI가 답변의 문법, 시제, 발화량을 분석 중입니다...</p>
+        </div>
+
+        <!-- Content State -->
+        <div id="feedback-content" class="space-y-4">
+          
+          <!-- Header with Estimated Grade -->
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div>
+              <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">예상 등급</span>
+              <h3 class="text-base font-extrabold text-slate-800 dark:text-slate-200">AI 실시간 진단</h3>
+            </div>
+            <div id="fb-grade-badge" class="text-xl font-black px-4 py-1.5 rounded-xl bg-indigo-500 text-white shadow-md">
+              IM2
+            </div>
+          </div>
+
+          <!-- Overall Summary -->
+          <div>
+            <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
+              <span>📋</span> 총평
+            </h4>
+            <p id="fb-summary-text" class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-100 dark:border-slate-800"></p>
+          </div>
+
+          <!-- IM Critical: Past Tense & Grammar Corrections -->
+          <div>
+            <h4 class="text-xs font-bold text-amber-600 dark:text-amber-400 mb-1.5 flex items-center gap-1">
+              <span>⚡</span> IM 핵심 점검 (과거 시제 & 문법)
+            </h4>
+            <p id="fb-past-tense-text" class="text-xs text-slate-600 dark:text-slate-400 mb-2 font-medium"></p>
+            <div id="fb-corrections-list" class="space-y-1.5">
+              <!-- Dynamically inserted corrections -->
+            </div>
+          </div>
+
+          <!-- Recommended Fillers -->
+          <div>
+            <h4 class="text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1">
+              <span>💬</span> 추천 오픽 필러 (말문 막힐 때)
+            </h4>
+            <div id="fb-fillers-tags" class="flex flex-wrap gap-1.5">
+              <!-- Dynamically inserted filler tags -->
+            </div>
+          </div>
+
+          <!-- Curated / Upgraded Model Answer -->
+          <div class="p-3.5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-indigo-700 dark:text-indigo-300 flex items-center gap-1">
+                <span>🎯</span> 입에 착 붙는 IM 맞춤 모범 답변
+              </span>
+              <button id="btn-speak-model-answer" class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1">
+                <span>🔊</span> 소리내어 듣기
+              </button>
+            </div>
+            <p id="model-answer-im" class="text-xs font-medium text-slate-700 dark:text-slate-300 leading-relaxed italic"></p>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ================= VIEW 2: SURVEY SETTINGS VIEW ================= -->
+    <div id="mode-survey-view" class="hidden space-y-4">
+      <section class="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-base font-extrabold text-slate-800 dark:text-slate-200">서베이 (Background Survey)</h2>
+            <p class="text-xs text-slate-400">선택한 항목에 맞춰 문제가 맞춤 출제됩니다.</p>
+          </div>
+          <span id="survey-count-badge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700">
+            12개 선택됨
+          </span>
+        </div>
+
+        <!-- 1-Click Golden Survey Button -->
+        <button id="btn-golden-survey" class="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-xs shadow-md shadow-amber-500/20 flex items-center justify-center space-x-1.5 transition-all">
+          <span>🏆</span>
+          <span>강사 추천 '황금 12개 조합' 1초 적용</span>
+        </button>
+
+        <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800 text-[11px] text-slate-500 space-y-1">
+          <p>• <strong>직업:</strong> 일 경험 없음 (추천 ★)</p>
+          <p>• <strong>학생:</strong> 아니오 (5년 이상 지남) (추천 ★)</p>
+          <p>• <strong>거주:</strong> 가족과 함께 아파트 거주 (추천 ★)</p>
+        </div>
+
+        <!-- Checkbox List -->
+        <div id="survey-checkbox-list" class="space-y-2 pt-1 max-h-[50vh] overflow-y-auto pr-1 custom-scrollbar">
+          <!-- Dynamically populated from questions.js -->
+        </div>
+      </section>
+    </div>
+
+    <!-- ================= VIEW 3: REVIEW & HISTORY VIEW ================= -->
+    <div id="mode-review-view" class="hidden space-y-4">
+      <section class="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-3">
+        <div class="flex items-center justify-between">
+          <h2 class="text-base font-extrabold text-slate-800 dark:text-slate-200">복습 및 오답 노트</h2>
+          <span class="text-xs text-slate-400">최근 연습 기록</span>
+        </div>
+
+        <div id="history-list" class="space-y-2.5 max-h-[65vh] overflow-y-auto pr-1 custom-scrollbar">
+          <!-- Dynamically populated from localStorage -->
+        </div>
+      </section>
+    </div>
+
+  </main>
+
+  <!-- Sticky Bottom Navigation Bar (Mobile App Style) -->
+  <nav class="fixed bottom-0 left-0 right-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200/80 dark:border-slate-800 py-2 px-3">
+    <div class="max-w-md mx-auto grid grid-cols-4 gap-1 text-center">
+      
+      <button data-nav-mode="random" class="flex flex-col items-center justify-center py-1 text-indigo-600 dark:text-indigo-400 font-bold transition-colors">
+        <span class="text-lg">🎲</span>
+        <span class="text-[11px] mt-0.5">랜덤 훈련</span>
+      </button>
+
+      <button data-nav-mode="mock" class="flex flex-col items-center justify-center py-1 text-slate-400 transition-colors">
+        <span class="text-lg">📝</span>
+        <span class="text-[11px] mt-0.5">모의고사</span>
+      </button>
+
+      <button data-nav-mode="survey" class="flex flex-col items-center justify-center py-1 text-slate-400 transition-colors">
+        <span class="text-lg">📋</span>
+        <span class="text-[11px] mt-0.5">서베이</span>
+      </button>
+
+      <button data-nav-mode="review" class="flex flex-col items-center justify-center py-1 text-slate-400 transition-colors">
+        <span class="text-lg">📚</span>
+        <span class="text-[11px] mt-0.5">복습 노트</span>
+      </button>
+
+    </div>
+  </nav>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4 max-h-[85vh] overflow-y-auto custom-scrollbar">
+      
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+        <h3 class="text-base font-bold text-slate-800 dark:text-slate-100">환경 설정</h3>
+        <button id="btn-close-settings" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          ✕
+        </button>
+      </div>
+
+      <!-- Gemini API Key -->
+      <div class="space-y-1.5">
+        <label class="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center justify-between">
+          <span>Gemini API Key</span>
+          <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-indigo-600 text-[11px] hover:underline font-normal">
+            무료 발급받기 ➔
+          </a>
+        </label>
+        <input type="password" id="setting-api-key" placeholder="AIzaSy..." 
+          class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <p class="text-[10px] text-slate-400">키를 입력하지 않아도 내장된 오픽 채점 엔진으로 무료 이용 가능합니다.</p>
+      </div>
+
+      <!-- Target Grade -->
+      <div class="space-y-1.5">
+        <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">목표 등급</label>
+        <select id="setting-target-level" class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <option value="IM" selected>IM (Intermediate Mid) - 추천</option>
+          <option value="IM1">IM1</option>
+          <option value="IM2">IM2</option>
+          <option value="IM3">IM3</option>
+          <option value="IH">IH (Intermediate High)</option>
+          <option value="AL">AL (Advanced Low)</option>
+        </select>
+      </div>
+
+      <!-- Voice Speed -->
+      <div class="space-y-1.5">
+        <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Ava 음성 재생 속도</label>
+        <select id="setting-speech-rate" class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <option value="0.85">0.85x (천천히)</option>
+          <option value="1.0" selected>1.0x (실제 시험 속도)</option>
+          <option value="1.15">1.15x (약간 빠르게)</option>
+        </select>
+      </div>
+
+      <!-- Voice Selector -->
+      <div class="space-y-1.5">
+        <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">영어 음성 선택</label>
+        <select id="setting-voice" class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <option value="">기본 영어 음성 (Ava)</option>
+        </select>
+      </div>
+
+      <!-- Save Button -->
+      <button id="btn-save-settings" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/20 transition-all">
+        설정 저장하기
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="questions.js"></script>
+  <script src="app.js"></script>
+
+</body>
+</html>
